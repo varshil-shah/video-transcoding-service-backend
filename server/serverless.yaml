@@ -1,0 +1,36 @@
+service: video-transcoder-server
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  environment:
+    basePath: ./
+    NODE_ENV: ${env:NODE_ENV}
+    REDIS_URL: ${env:REDIS_URL}
+    MONGO_URI: ${env:MONGO_URI}
+    AWS_REGION: ${env:AWS_REGION}
+    AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN}
+    JWT_COOKIE_EXPIRES_IN: ${env:JWT_COOKIE_EXPIRES_IN}
+    TEMP_S3_BUCKET_NAME: ${env:TEMP_S3_BUCKET_NAME}
+    FINAL_S3_BUCKET_NAME: ${env:FINAL_S3_BUCKET_NAME}
+    SUBNET_IDS: ${env:SUBNET_IDS}
+    SECURITY_GROUP_IDS: ${env:SECURITY_GROUP_IDS}
+    WEBHOOK_URL: ${env:WEBHOOK_URL}
+    CLUSTER: ${env:CLUSTER}
+    TASK: ${env:TASK}
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+useDotenv: true
+
+functions:
+  api:
+    handler: ./index.handler
+    events:
+      - httpApi: "*"
