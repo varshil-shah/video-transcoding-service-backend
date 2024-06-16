@@ -7,7 +7,6 @@ const {
   enqueJobInQueue,
   getKey,
   increment,
-  getQueueLength,
   setKey,
   getQueueLength,
 } = require("../redis/redis");
