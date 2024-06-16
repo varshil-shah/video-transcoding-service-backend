@@ -1,10 +1,10 @@
 const { ECSClient, RunTaskCommand } = require("@aws-sdk/client-ecs");
 
 const ecsClient = new ECSClient({
-  region: process.env.AWS_REGION,
+  region: process.env.MY_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
   },
 });
 
@@ -45,12 +45,12 @@ async function triggerTranscodingJob(job) {
                 value: process.env.FINAL_S3_BUCKET_NAME,
               },
               {
-                name: "AWS_ACCESS_KEY_ID",
-                value: process.env.AWS_ACCESS_KEY_ID,
+                name: "MY_AWS_ACCESS_KEY_ID",
+                value: process.env.MY_AWS_ACCESS_KEY_ID,
               },
               {
-                name: "AWS_SECRET_ACCESS_KEY",
-                value: process.env.AWS_SECRET_ACCESS_KEY,
+                name: "MY_AWS_SECRET_ACCESS_KEY",
+                value: process.env.MY_AWS_SECRET_ACCESS_KEY,
               },
               { name: "WEBHOOK_URL", value: process.env.WEBHOOK_URL },
             ],

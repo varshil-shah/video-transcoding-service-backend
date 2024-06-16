@@ -32,5 +32,9 @@
     "mongoose": "^8.4.1",
     "morgan": "^1.10.0",
     "serverless-http": "^3.2.0"
+  },
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-offline": "^13.6.0"
   }
 }
