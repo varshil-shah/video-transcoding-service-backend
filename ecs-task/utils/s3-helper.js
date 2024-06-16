@@ -17,6 +17,23 @@ const s3Client = new S3Client({
   },
 });
 
+async function generatePresignedUrl(bucketName, key) {
+  try {
+    console.log("Generating presigned URL for...");
+
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    });
+
+    const url = await getSignedUrl(s3Client, command);
+    return url;
+  } catch (error) {
+    console.error("Error generating presigned URL");
+    console.error(error);
+  }
+}
+
 async function uploadFileToS3Bucket(filePath, file, bucketName) {
   try {
     const fileName = file.split("/").pop().split(".")[0];
@@ -38,4 +55,4 @@ async function uploadFileToS3Bucket(filePath, file, bucketName) {
   }
 }
 
-module.exports = { uploadFileToS3Bucket };
+module.exports = { uploadFileToS3Bucket, generatePresignedUrl };
