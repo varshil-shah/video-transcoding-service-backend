@@ -5,6 +5,9 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
+const userRouter = require("./routes/user.router");
+const globalErrorHandler = require("./controllers/error-controller");
+
 app.use(morgan("dev"));
 
 app.use(cors());
@@ -18,8 +21,12 @@ app.get("/", (req, res) => {
   res.status(200).send("Server is up and running! 🚀");
 });
 
+app.use("/api/v1/users", userRouter);
+
 app.all("*", (req, res) => {
   res.status(404).send(`Can't find ${req.originalUrl} on this server!`);
 });
+
+app.use(globalErrorHandler);
 
 module.exports = app;
