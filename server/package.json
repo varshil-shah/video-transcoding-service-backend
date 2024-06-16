@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend for video transcoding service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varshil-shah/video-transcoding-service-backend.git"
+  },
+  "author": "Varshil Shah",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/varshil-shah/video-transcoding-service-backend/issues"
+  },
+  "homepage": "https://github.com/varshil-shah/video-transcoding-service-backend#readme",
+  "dependencies": {
+    "@aws-sdk/client-ecs": "^3.598.0",
+    "@aws-sdk/client-s3": "^3.598.0",
+    "@aws-sdk/s3-request-presigner": "^3.598.0",
+    "axios": "^1.7.2",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.1"
+  }
+}
