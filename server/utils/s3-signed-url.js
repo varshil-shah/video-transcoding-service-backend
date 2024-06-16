@@ -3,6 +3,7 @@ const {
   GetObjectCommand,
   PutObjectCommand,
   DeleteObjectCommand,
+  HeadObjectCommand,
 } = require("@aws-sdk/client-s3");
 
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
@@ -14,6 +15,21 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
+
+async function getObjectMetadata(key) {
+  try {
+    const command = new HeadObjectCommand({
+      Bucket: process.env.TEMP_S3_BUCKET_NAME,
+      Key: key,
+    });
+
+    const response = await s3Client.send(command);
+    return response.Metadata;
+  } catch (error) {
+    console.log("Error occured while getting object metadata");
+    console.log(error);
+  }
+}
 
 async function generateUrlToPutObject(userId, fileName, contentType) {
   try {
@@ -53,4 +69,8 @@ async function deleteObjectFile(key) {
   }
 }
 
-module.exports = { generateUrlToPutObject, deleteObjectFile };
+module.exports = {
+  generateUrlToPutObject,
+  deleteObjectFile,
+  getObjectMetadata,
+};

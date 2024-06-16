@@ -70,6 +70,10 @@ async function decrement(key) {
   return value;
 }
 
+async function getQueueLength() {
+  return redis.llen(REDIS_KEYS.VIDEO_TRANSCODING_QUEUE);
+}
+
 module.exports = {
   enqueJobInQueue,
   dequeueJobFromQueue,
@@ -78,4 +82,5 @@ module.exports = {
   deleteKey,
   increment,
   decrement,
+  getQueueLength,
 };

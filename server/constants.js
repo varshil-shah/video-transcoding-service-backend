@@ -11,10 +11,7 @@ const REDIS_KEYS = {
   VIDEO_TRANSCODING_QUEUE: "VIDEO_TRANSCODING_QUEUE",
 };
 
-const DB_NAME = "video-transcoding-service";
-
 module.exports = {
   VIDEO_PROCESS_STATES,
   REDIS_KEYS,
-  DB_NAME,
 };

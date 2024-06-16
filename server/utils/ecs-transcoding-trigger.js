@@ -13,8 +13,8 @@ const config = {
   TASK: process.env.TASK,
 };
 
-const listOfSubnets = process.env.SUBNET_ID.split(",");
-const listOfSecurityGroups = process.env.SECURITY_GROUP_ID.split(",");
+const listOfSubnets = process.env.SUBNET_IDS.split(",");
+const listOfSecurityGroups = process.env.SECURITY_GROUP_IDS.split(",");
 
 async function triggerTranscodingJob(job) {
   try {
