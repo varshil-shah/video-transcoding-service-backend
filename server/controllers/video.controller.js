@@ -3,7 +3,6 @@ const catchAsync = require("../utils/catch-async");
 const AppError = require("../utils/app-error");
 
 const { generateUrlToPutObject } = require("../utils/s3-signed-url");
-const { VIDEO_PROCESS_STATES } = require("../constants");
 
 exports.uploadVideo = catchAsync(async (req, res, next) => {
   const { fileName, contentType } = req.body;
@@ -14,18 +13,9 @@ exports.uploadVideo = catchAsync(async (req, res, next) => {
     contentType
   );
 
-  const video = await Video.create({
-    owner: req.user.id,
-    fileName,
-    status: VIDEO_PROCESS_STATES.PENDING,
-  });
-
   res.status(200).json({
     status: "success",
     url: signedUrl,
-    data: {
-      video,
-    },
   });
 });
 
