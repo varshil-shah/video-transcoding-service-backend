@@ -30,6 +30,7 @@ async function generateUrlToPutObject(userId, fileName, contentType) {
       expiresIn: 3600,
     });
 
+    console.log("Signed url generated to put object");
     return signedUrl;
   } catch (error) {
     console.log("Error occured while generating signed URL to put object");
@@ -37,4 +38,19 @@ async function generateUrlToPutObject(userId, fileName, contentType) {
   }
 }
 
-module.exports = { generateUrlToPutObject };
+async function deleteObjectFile(key) {
+  try {
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.TEMP_S3_BUCKET_NAME,
+      Key: key,
+    });
+
+    await s3Client.send(command);
+    console.log("Object deleted successfully");
+  } catch (error) {
+    console.log("Error occured while deleting object");
+    console.log(error);
+  }
+}
+
+module.exports = { generateUrlToPutObject, deleteObjectFile };
