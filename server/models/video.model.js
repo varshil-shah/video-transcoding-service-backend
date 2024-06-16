@@ -4,7 +4,6 @@ const videoSchema = new mongoose.Schema(
   {
     fileName: {
       type: String,
-      required: true,
       trim: true,
     },
     videoResolutions: {
@@ -13,9 +12,11 @@ const videoSchema = new mongoose.Schema(
       "720p": String,
       "1080p": String,
     },
+    videoLink: {
+      type: String,
+    },
     objectKey: {
       type: String,
-      required: true,
     },
     thumbnailUrl: {
       type: String,
@@ -24,16 +25,13 @@ const videoSchema = new mongoose.Schema(
       type: String,
       default: "mp4",
     },
-
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-
     progress: {
       type: String,
       enum: ["pending", "processing", "completed", "failed", "queued"],
-      required: true,
       default: "pending",
     },
   },
