@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 const userRouter = require("./routes/user.router");
+const videoRouter = require("./routes/video.router");
 const globalErrorHandler = require("./controllers/error-controller");
 
 app.use(morgan("dev"));
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/videos", videoRouter);
 
 app.all("*", (req, res) => {
   res.status(404).send(`Can't find ${req.originalUrl} on this server!`);
