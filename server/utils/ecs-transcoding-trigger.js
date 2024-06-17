@@ -33,7 +33,7 @@ async function triggerTranscodingJob(job) {
       overrides: {
         containerOverrides: [
           {
-            name: "video-transcoding-service",
+            name: "video-transcoding-service-image",
             environment: [
               { name: "OBJECT_KEY", value: job.objectKey },
               {
