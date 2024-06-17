@@ -4,10 +4,12 @@ require("dotenv").config();
 module.exports.handler = async (event) => {
   try {
     console.log("S3 trigger received!");
-    console.log(event);
+    console.log(JSON.stringify(event));
+
+    const s3EventData = event.Records[0].s3;
 
     const response = await axios.post(process.env.API_ENDPOINT, {
-      s3EventData: event,
+      s3EventData,
     });
 
     console.log("API response received!");
