@@ -14,5 +14,6 @@ router.post("/upload", videoController.uploadVideo);
 router.get("/me", videoController.getAllVideosByMe);
 router.get("/", videoController.getVideos);
 router.get("/:id", videoController.getVideo);
+router.get("/:id/status", videoController.getVideoStatus);
 
 module.exports = router;
