@@ -46,7 +46,7 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
     fileName,
     progress: VIDEO_PROCESS_STATES.PENDING,
     objectKey: key,
-    userId: metadata["x-amz-meta-userid"],
+    owner: metadata["x-amz-meta-userid"],
   });
 
   if (!video) {
@@ -99,7 +99,7 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
 const handleECSTrigger = catchAsync(async (req, res, next) => {
   console.log("ECS trigger received!");
 
-  const { key, progress, videoResolutions } = req.body;
+  const { key, progress, videoResolutions, playlist } = req.body;
   const video = await Video.findOne({ objectKey: key });
 
   if (!video) {
@@ -158,6 +158,7 @@ const handleECSTrigger = catchAsync(async (req, res, next) => {
         { objectKey: job.objectKey },
         {
           progress: VIDEO_PROCESS_STATES.PROCESSING,
+          playlist,
         }
       );
 
