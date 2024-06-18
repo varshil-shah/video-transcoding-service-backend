@@ -74,6 +74,22 @@ async function getQueueLength() {
   return redis.llen(REDIS_KEYS.VIDEO_TRANSCODING_QUEUE);
 }
 
+async function deleteAllKeys() {
+  return redis.flushall();
+}
+
+// deleteKey(REDIS_KEYS.VIDEO_TRANSCODING_QUEUE).then((value) => {
+//   console.log("Value: ", value);
+// });
+
+// deleteKey(REDIS_KEYS.CURRENT_VIDEO_TRANSCODING_JOB_COUNT).then((value) => {
+//   console.log("Value: ", value);
+// });
+
+// dequeueJobFromQueue().then((job) => {
+//   console.log("Job: ", job);
+// });
+
 module.exports = {
   enqueJobInQueue,
   dequeueJobFromQueue,

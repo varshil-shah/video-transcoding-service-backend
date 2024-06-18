@@ -24,6 +24,7 @@ async function getObjectMetadata(key) {
     });
 
     const response = await s3Client.send(command);
+    console.log({ meta: response.Metadata });
     return response.Metadata;
   } catch (error) {
     console.log("Error occured while getting object metadata");
