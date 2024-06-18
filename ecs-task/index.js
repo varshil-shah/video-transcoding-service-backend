@@ -22,7 +22,6 @@ async function markTaskAsCompleted(key, allFilesObjects) {
       key,
       progress: VIDEO_PROCESS_STATES.COMPLETED,
       videoResolutions: allFilesObjects,
-      playlist: allFilesObjects.playlist,
     });
 
     if (response.status === 200) {

@@ -24,6 +24,7 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
   console.log("S3 trigger received!");
 
   const { s3EventData } = req.body;
+  // const s3EventData = req.body.Records[0].s3;
 
   if (!s3EventData) {
     return res.status(400).json({
@@ -46,7 +47,7 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
     fileName,
     progress: VIDEO_PROCESS_STATES.PENDING,
     objectKey: key,
-    owner: metadata["x-amz-meta-userid"],
+    owner: metadata.userid,
   });
 
   if (!video) {
@@ -99,7 +100,7 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
 const handleECSTrigger = catchAsync(async (req, res, next) => {
   console.log("ECS trigger received!");
 
-  const { key, progress, videoResolutions, playlist } = req.body;
+  const { key, progress, videoResolutions } = req.body;
   const video = await Video.findOne({ objectKey: key });
 
   if (!video) {

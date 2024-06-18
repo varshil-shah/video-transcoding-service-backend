@@ -11,9 +11,7 @@ const videoSchema = new mongoose.Schema(
       "480p": String,
       "720p": String,
       "1080p": String,
-    },
-    playlist: {
-      type: String,
+      playlist: String,
     },
     objectKey: {
       type: String,

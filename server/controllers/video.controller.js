@@ -34,6 +34,19 @@ exports.getVideo = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getVideoStatus = catchAsync(async (req, res, next) => {
+  const video = await Video.findById(req.params.id);
+
+  if (!video) {
+    return next(new AppError("No video found with that ID!", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    progress: video.progress,
+  });
+});
+
 exports.getVideos = catchAsync(async (req, res, next) => {
   const videos = await Video.find();
 
