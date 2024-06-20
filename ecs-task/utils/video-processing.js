@@ -34,7 +34,7 @@ function calculateBandwidth(resolution) {
 }
 
 const s3Client = new S3Client({
-  region: "ap-south-1",
+  region: process.env.MY_AWS_REGION,
   credentials: {
     accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
@@ -74,9 +74,9 @@ function convertVideo(format, folderPath, videoPath) {
         console.error(error);
         reject();
       })
-      .on("progress", (progress) => {
-        console.log(`Processing: ${progress.percent}% done`);
-      })
+      // .on("progress", (progress) => {
+      //   console.log(`Processing: ${progress.percent}% done`);
+      // })
       .run();
   });
 }
@@ -180,10 +180,8 @@ async function uploadFile(filePath, finalBucketName, videoName, prefix = "") {
       } else if (key.includes("playlist.m3u8")) {
         allLinks["playlist"] = objectLink;
       }
-      console.log({ objectLink });
+      console.log("Video link for resolution", key, objectLink);
     }
-
-    console.log(`File uploaded to S3 bucket successfully! (${filePath})`);
 
     return data;
   } catch (error) {

@@ -45,6 +45,10 @@ async function triggerTranscodingJob(job) {
                 value: process.env.FINAL_S3_BUCKET_NAME,
               },
               {
+                name: "MY_AWS_REGION",
+                value: process.env.MY_AWS_REGION,
+              },
+              {
                 name: "MY_AWS_ACCESS_KEY_ID",
                 value: process.env.MY_AWS_ACCESS_KEY_ID,
               },
