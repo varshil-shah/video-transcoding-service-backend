@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const ffmpeg = require("fluent-ffmpeg");
+const { Worker } = require("worker_threads");
 
 const {
   S3Client,
@@ -89,9 +90,35 @@ async function runParallelTasks(folderPath, videoPath) {
     process.exit(1);
   }
 
-  const tasks = videoFormat.map((format) =>
-    convertVideo(format, folderPath, videoPath)
-  );
+  const tasks = videoFormat.map((format) => {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(path.join(__dirname, "video-worker.js"), {
+        workerData: {
+          format,
+          folderPath,
+          videoPath,
+        },
+      });
+
+      worker.on("message", (message) => {
+        if (message.status === "success") {
+          resolve();
+        } else {
+          reject(new Error(message.error));
+        }
+      });
+
+      worker.on("error", (error) => {
+        reject(error);
+      });
+
+      worker.on("exit", (code) => {
+        if (code !== 0) {
+          reject(new Error(`Worker stopped with exit code ${code}`));
+        }
+      });
+    });
+  });
 
   try {
     await Promise.all(tasks);
@@ -156,7 +183,7 @@ async function uploadFile(filePath, finalBucketName, videoName, prefix = "") {
   try {
     const fileStream = fs.createReadStream(filePath);
     const fileName = path.basename(filePath);
-    let key = `${videoName}/`;
+    let key = `videos/${videoName}/`;
     key += prefix ? `${prefix}${fileName}` : fileName;
 
     const data = await s3Client.send(
