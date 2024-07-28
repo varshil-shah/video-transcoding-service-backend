@@ -16,14 +16,22 @@ module.exports.handler = async (event) => {
     console.log(`Status: ${response.status} | Data: ${response.data}`);
 
     return {
-      statusCode: response.status,
-      body: JSON.stringify("S3 event trigger processed successfully!"),
+      statusCode: 200,
+      body: JSON.stringify({
+        status: "success",
+        message: "S3 event trigger processed successfully!",
+        body: response?.data,
+      }),
     };
   } catch (error) {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify("Error while processing S3 event trigger!"),
+      body: JSON.stringify({
+        status: "error",
+        message: "Error processing S3 event trigger!",
+        error: error,
+      }),
     };
   }
 };
