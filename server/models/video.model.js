@@ -2,6 +2,18 @@ const mongoose = require("mongoose");
 
 const videoSchema = new mongoose.Schema(
   {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
+    duration: {
+      type: Number,
+    },
     fileName: {
       type: String,
       trim: true,
@@ -15,6 +27,7 @@ const videoSchema = new mongoose.Schema(
     },
     objectKey: {
       type: String,
+      required: true,
     },
     thumbnailUrl: {
       type: String,
@@ -26,11 +39,20 @@ const videoSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     progress: {
       type: String,
       enum: ["pending", "processing", "completed", "failed", "queued"],
       default: "pending",
+    },
+    views: {
+      type: Number,
+      default: 0,
+    },
+    isPublished: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

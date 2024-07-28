@@ -12,8 +12,16 @@ const userSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
+    watchHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Video",
+      },
+    ],
     password: {
       type: String,
+      required: true,
+      minlength: 8,
     },
   },
   { timestamps: true }
