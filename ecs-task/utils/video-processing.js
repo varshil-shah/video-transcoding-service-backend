@@ -19,19 +19,6 @@ const videoFormat = [
   { name: "1080P", scale: "w=1920:h=1080", resolution: "1920x1080" },
 ];
 
-function getVideoDuration(videoPath) {
-  return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(videoPath, (error, metadata) => {
-      if (error) {
-        reject(error);
-      } else {
-        console.log("Video duration:", metadata.format.duration);
-        resolve(metadata.format.duration);
-      }
-    });
-  });
-}
-
 function calculateBandwidth(resolution) {
   switch (resolution) {
     case "640x360":

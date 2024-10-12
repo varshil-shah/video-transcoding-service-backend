@@ -8,7 +8,6 @@ const {
   generatePlaylistFile,
   uploadFolderToS3Bucket,
   deleteObjectFromTempBucket,
-  getVideoDuration,
 } = require("./utils/video-processing");
 const { VIDEO_PROCESS_STATES } = require("./utils/constants");
 
@@ -19,13 +18,10 @@ async function markTaskAsCompleted(key, allFilesObjects, videoPath) {
     const webhookUrl = process.env.WEBHOOK_URL;
     console.log("Webhook URL => ", webhookUrl);
 
-    const duration = await getVideoDuration(videoPath);
-
     const response = await axios.post(webhookUrl, {
       key,
       progress: VIDEO_PROCESS_STATES.COMPLETED,
       videoResolutions: allFilesObjects,
-      duration,
     });
 
     if (response.status === 200) {
