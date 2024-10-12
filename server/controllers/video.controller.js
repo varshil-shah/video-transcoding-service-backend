@@ -37,6 +37,9 @@ exports.getVideo = catchAsync(async (req, res, next) => {
     return next(new AppError("No video found with that ID!", 404));
   }
 
+  video.views += 1;
+  await video.save();
+
   res.status(200).json({
     status: "success",
     data: {
@@ -59,7 +62,9 @@ exports.getVideoStatus = catchAsync(async (req, res, next) => {
 });
 
 exports.getVideos = catchAsync(async (req, res, next) => {
-  const videos = await Video.find();
+  const videos = await Video.find().select(
+    "-__v -updatedAt -fileName -videoResolutions -objectKey -type"
+  );
 
   res.status(200).json({
     status: "success",

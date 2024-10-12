@@ -114,16 +114,15 @@ const handleECSTrigger = catchAsync(async (req, res, next) => {
 
   if (progress === VIDEO_PROCESS_STATES.COMPLETED) {
     video.progress = VIDEO_PROCESS_STATES.COMPLETED;
-    video.videoResolutions = videoResolutions;
-    await video.save();
     await deleteObjectFile(key);
   }
 
   if (progress === VIDEO_PROCESS_STATES.FAILED) {
     video.progress = VIDEO_PROCESS_STATES.FAILED;
-    video.videoResolutions = videoResolutions;
-    await video.save();
   }
+
+  video.videoResolutions = videoResolutions;
+  await video.save();
 
   await decrement(REDIS_KEYS.CURRENT_VIDEO_TRANSCODING_JOB_COUNT);
 

@@ -1,4 +1,5 @@
 const User = require("../models/user.model");
+const Video = require("../models/video.model");
 const catchAsync = require("../utils/catch-async");
 const AppError = require("../utils/app-error");
 
@@ -31,11 +32,13 @@ exports.getUser = catchAsync(async (req, res, next) => {
 
 exports.getCurrentUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("-password");
+  const videos = await Video.find({ owner: req.params.id });
 
   res.status(200).json({
     status: "success",
     data: {
       user,
+      videos,
     },
   });
 });
