@@ -48,6 +48,8 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
     progress: VIDEO_PROCESS_STATES.PENDING,
     objectKey: key,
     owner: metadata.userid,
+    title: metadata.title,
+    description: metadata.description,
   });
 
   if (!video) {

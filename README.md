@@ -8,6 +8,13 @@ Here is the backend demo of the video transcoding service:
 
 [![Video Transcoding Service](/images/wallpaper.png)](https://youtu.be/hsIb15Cj6qc)
 
+### Features
+
+- **Automatic Video Transcoding**: Automatically transcode the uploaded video into multiple resolutions.
+- **Scalable**: The system is built on AWS services, making it scalable and reliable.
+- **Adaptive Bitrate Streaming**: Uses HLS to generate multiple resolutions of the video for adaptive bitrate streaming.
+- **Dockerized**: The system is dockerized for easy deployment and scaling.
+
 ### Architecture
 
 The system is built on AWS services, including S3, Lambda, API Gateway, ECR and ECS. The architecture is as follows:

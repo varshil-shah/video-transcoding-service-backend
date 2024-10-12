@@ -32,7 +32,13 @@ async function getObjectMetadata(key) {
   }
 }
 
-async function generateUrlToPutObject(userId, fileName, contentType) {
+async function generateUrlToPutObject(
+  userId,
+  title,
+  description,
+  fileName,
+  contentType
+) {
   try {
     const command = new PutObjectCommand({
       Bucket: process.env.TEMP_S3_BUCKET_NAME,
@@ -40,6 +46,8 @@ async function generateUrlToPutObject(userId, fileName, contentType) {
       ContentType: contentType,
       Metadata: {
         userId,
+        title,
+        description,
       },
     });
 

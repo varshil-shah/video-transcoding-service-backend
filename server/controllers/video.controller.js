@@ -5,10 +5,21 @@ const AppError = require("../utils/app-error");
 const { generateUrlToPutObject } = require("../utils/s3-signed-url");
 
 exports.uploadVideo = catchAsync(async (req, res, next) => {
-  const { fileName, contentType } = req.body;
+  const { fileName, contentType, title, description } = req.body;
+
+  if (!fileName || !contentType || !title || !description) {
+    return next(
+      new AppError(
+        "Please provide a file name, content type, title & description",
+        400
+      )
+    );
+  }
 
   const signedUrl = await generateUrlToPutObject(
     req.user.id,
+    title,
+    description,
     fileName,
     contentType
   );
