@@ -271,5 +271,4 @@ module.exports = {
   generatePlaylistFile,
   uploadFolderToS3Bucket,
   deleteObjectFromTempBucket,
-  getVideoDuration,
 };
