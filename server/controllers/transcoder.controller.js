@@ -61,6 +61,7 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
 
   if (currentJobCount <= 5) {
     await increment(REDIS_KEYS.CURRENT_VIDEO_TRANSCODING_JOB_COUNT);
+    console.log("Current job count incremented:", currentJobCount + 1);
 
     const job = {
       fileName,
@@ -69,17 +70,19 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
     };
 
     await triggerTranscodingJob(job);
+    console.log(`Transcoding job trigger for ${fileName}!`);
 
     await Video.findByIdAndUpdate(video._id, {
       progress: VIDEO_PROCESS_STATES.PROCESSING,
     });
 
-    console.log(`Transcoding job trigger for ${fileName}!`);
+    console.log("Video progress updated to PROCESSING!");
     return res.status(200).json({
       status: "success",
       message: `Transcoding job triggered for ${fileName}!`,
     });
   } else {
+    console.log("Current job count exceeded 5:", currentJobCount);
     const job = {
       fileName,
       objectKey: key,
@@ -87,10 +90,12 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
     };
 
     await enqueJobInQueue(job);
+    console.log(`Transcoding job queued for ${fileName}!`);
 
     await Video.findByIdAndUpdate(video._id, {
       progress: VIDEO_PROCESS_STATES.QUEUED,
     });
+    console.log("Video progress updated to QUEUED!");
 
     return res.status(200).json({
       status: "success",
@@ -103,7 +108,10 @@ const handleECSTrigger = catchAsync(async (req, res, next) => {
   console.log("ECS trigger received!");
 
   const { key, progress, videoResolutions } = req.body;
+  console.log({ key, progress, videoResolutions });
+
   const video = await Video.findOne({ objectKey: key });
+  console.log("Video:", video);
 
   if (!video) {
     return res.status(404).json({

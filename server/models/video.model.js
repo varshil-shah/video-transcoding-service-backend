@@ -61,11 +61,6 @@ const videoSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-videoSchema.pre(/^find/, function (next) {
-  this.where({ progress: "completed" });
-  next();
-});
-
 const Video = mongoose.model("Video", videoSchema);
 
 Video.collection.createIndex({ title: "text", description: "text" });

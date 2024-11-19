@@ -1,5 +1,8 @@
 const Redis = require("ioredis");
 const { REDIS_KEYS } = require("../constants");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const redis = new Redis(process.env.REDIS_URL);
 
@@ -74,9 +77,9 @@ async function getQueueLength() {
   return redis.llen(REDIS_KEYS.VIDEO_TRANSCODING_QUEUE);
 }
 
-async function deleteAllKeys() {
-  return redis.flushall();
-}
+// async function deleteAllKeys() {
+//   return redis.flushall();
+// }
 
 // deleteKey(REDIS_KEYS.VIDEO_TRANSCODING_QUEUE).then((value) => {
 //   console.log("Value: ", value);
