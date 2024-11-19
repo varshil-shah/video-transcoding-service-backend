@@ -1,6 +1,7 @@
 const Video = require("../models/video.model");
 const catchAsync = require("../utils/catch-async");
 const AppError = require("../utils/app-error");
+const { deleteAllKeys } = require("../redis/redis");
 
 const { generateUrlToPutObject } = require("../utils/s3-signed-url");
 
@@ -84,5 +85,14 @@ exports.getAllVideosByMe = catchAsync(async (req, res, next) => {
     data: {
       videos,
     },
+  });
+});
+
+exports.resetRedisCache = catchAsync(async (req, res, next) => {
+  await deleteAllKeys();
+
+  res.status(200).json({
+    status: "success",
+    message: "Redis cache cleared!",
   });
 });
