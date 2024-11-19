@@ -32,6 +32,9 @@ const videoSchema = new mongoose.Schema(
     thumbnailUrl: {
       type: String,
     },
+    captionUrl: {
+      type: String,
+    },
     type: {
       type: String,
       default: "mp4",
