@@ -107,8 +107,8 @@ const handleS3Trigger = catchAsync(async (req, res, next) => {
 const handleECSTrigger = catchAsync(async (req, res, next) => {
   console.log("ECS trigger received!");
 
-  const { key, progress, videoResolutions } = req.body;
-  console.log({ key, progress, videoResolutions });
+  const { key, progress, videoResolutions, thumbnailUrl } = req.body;
+  console.log({ key, progress, videoResolutions, thumbnailUrl });
 
   const video = await Video.findOne({ objectKey: key });
   console.log("Video:", video);
@@ -130,6 +130,7 @@ const handleECSTrigger = catchAsync(async (req, res, next) => {
   }
 
   video.videoResolutions = videoResolutions;
+  video.thumbnailUrl = thumbnailUrl;
   await video.save();
 
   await decrement(REDIS_KEYS.CURRENT_VIDEO_TRANSCODING_JOB_COUNT);

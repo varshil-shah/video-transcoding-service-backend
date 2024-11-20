@@ -7,13 +7,14 @@ const {
   downloadVideo,
   generatePlaylistFile,
   uploadFolderToS3Bucket,
+  generateThumbnail,
   deleteObjectFromTempBucket,
 } = require("./utils/video-processing");
 const { VIDEO_PROCESS_STATES } = require("./utils/constants");
 
 require("dotenv").config();
 
-async function markTaskAsCompleted(key, allFilesObjects, videoPath) {
+async function markTaskAsCompleted(key, allFilesObjects, thumbnailUrl) {
   try {
     const webhookUrl = process.env.WEBHOOK_URL;
     console.log("Webhook URL => ", webhookUrl);
@@ -22,6 +23,7 @@ async function markTaskAsCompleted(key, allFilesObjects, videoPath) {
       key,
       progress: VIDEO_PROCESS_STATES.COMPLETED,
       videoResolutions: allFilesObjects,
+      thumbnailUrl,
     });
 
     if (response.status === 200) {
@@ -61,6 +63,12 @@ async function markTaskAsCompleted(key, allFilesObjects, videoPath) {
     console.log("Downloading video from S3 bucket...");
     await downloadVideo(key, bucketName, path.join(folderPath, videoName));
 
+    const [thumbnailUrl] = await Promise.all([
+      generateThumbnail(key, bucketName),
+      downloadVideo(key, bucketName, path.join(folderPath, videoName)),
+    ]);
+
+    console.log("Thumbnail URL => ", thumbnailUrl);
     console.log("Video downloaded successfully!");
 
     const downloadedVideoPath = path.join(folderPath, videoName);
@@ -76,9 +84,10 @@ async function markTaskAsCompleted(key, allFilesObjects, videoPath) {
       videoNameWithoutExtension
     );
 
-    await markTaskAsCompleted(key, allLinks, downloadedVideoPath);
-
-    await deleteObjectFromTempBucket(key);
+    await Promise.all([
+      markTaskAsCompleted(key, allLinks, thumbnailUrl),
+      deleteObjectFromTempBucket(key),
+    ]);
 
     console.log("Video processing completed successfully!");
     process.exit(0);

@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const ffmpeg = require("fluent-ffmpeg");
 const { Worker } = require("worker_threads");
+const axios = require("axios");
 
 const {
   S3Client,
@@ -236,10 +237,11 @@ async function uploadFolderToS3Bucket(
   folderPath,
   finalBucketName,
   videoName,
-  perfix = ""
+  prefix = ""
 ) {
   try {
     const files = fs.readdirSync(folderPath);
+    const uploadPromises = [];
 
     for (const file of files) {
       const filePath = path.join(folderPath, file);
@@ -247,21 +249,47 @@ async function uploadFolderToS3Bucket(
 
       if (fileStats.isDirectory()) {
         const currentDir = path.basename(filePath);
-        await uploadFolderToS3Bucket(
-          filePath,
-          finalBucketName,
-          videoName,
-          `${perfix}${currentDir}/`
+        uploadPromises.push(
+          uploadFolderToS3Bucket(
+            filePath,
+            finalBucketName,
+            videoName,
+            `${prefix}${currentDir}/`
+          )
         );
       } else {
-        await uploadFile(filePath, finalBucketName, videoName, perfix);
+        uploadPromises.push(
+          uploadFile(filePath, finalBucketName, videoName, prefix)
+        );
       }
     }
 
+    await Promise.all(uploadPromises);
     return allLinks;
   } catch (error) {
     console.error("Error uploading folder to S3 bucket");
     console.error(error);
+    throw error; // Propagate error for better error handling
+  }
+}
+
+async function generateThumbnail(objectKey, bucketName) {
+  const videoUrl = `https://s3.ap-south-1.amazonaws.com/${bucketName}/${objectKey}`;
+
+  try {
+    const response = await axios.post(process.env.THUMBNAIL_API_ENDPOINT, {
+      video_url: videoUrl,
+    });
+
+    if (response.status === 200 && response.data.thumbnail_url) {
+      console.log("Thumbnail generated successfully!");
+      return response.data.thumbnail_url;
+    } else {
+      throw new Error("Failed to generate thumbnail");
+    }
+  } catch (error) {
+    console.error("Error generating thumbnail:", error);
+    throw error;
   }
 }
 
@@ -271,4 +299,5 @@ module.exports = {
   generatePlaylistFile,
   uploadFolderToS3Bucket,
   deleteObjectFromTempBucket,
+  generateThumbnail,
 };

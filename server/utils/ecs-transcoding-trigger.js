@@ -57,6 +57,10 @@ async function triggerTranscodingJob(job) {
                 value: process.env.MY_AWS_SECRET_ACCESS_KEY,
               },
               { name: "WEBHOOK_URL", value: process.env.WEBHOOK_URL },
+              {
+                name: "THUMBNAIL_API_ENDPOINT",
+                value: process.env.THUMBNAIL_API_ENDPOINT,
+              },
             ],
           },
         ],
