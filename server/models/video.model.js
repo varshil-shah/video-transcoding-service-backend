@@ -32,7 +32,7 @@ const videoSchema = new mongoose.Schema(
     thumbnailUrl: {
       type: String,
     },
-    captionUrl: {
+    subtitleUrl: {
       type: String,
     },
     type: {

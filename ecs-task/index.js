@@ -8,6 +8,7 @@ const {
   generatePlaylistFile,
   uploadFolderToS3Bucket,
   generateThumbnail,
+  generateSubtitle,
   deleteObjectFromTempBucket,
 } = require("./utils/video-processing");
 const { VIDEO_PROCESS_STATES } = require("./utils/constants");
@@ -24,6 +25,7 @@ async function markTaskAsCompleted(key, allFilesObjects, thumbnailUrl) {
       progress: VIDEO_PROCESS_STATES.COMPLETED,
       videoResolutions: allFilesObjects,
       thumbnailUrl,
+      subtitleUrl: allFilesObjects.subtitle,
     });
 
     if (response.status === 200) {
@@ -65,6 +67,7 @@ async function markTaskAsCompleted(key, allFilesObjects, thumbnailUrl) {
 
     const [thumbnailUrl] = await Promise.all([
       generateThumbnail(key, bucketName),
+      generateSubtitle(key, bucketName),
       downloadVideo(key, bucketName, path.join(folderPath, videoName)),
     ]);
 

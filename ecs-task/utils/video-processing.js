@@ -139,12 +139,15 @@ function generatePlaylistFile(folderPath) {
 
     videoFormat.forEach((format) => {
       const bandwidth = calculateBandwidth(format.resolution);
-      playlistContent += `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${format.resolution}\n`;
+      playlistContent += `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${format.resolution},SUBTITLES="subs"\n`;
       playlistContent += `${format.name}/index.m3u8\n`;
-
-      fs.writeFileSync(playlistPath, playlistContent);
-      console.log("Playlist file generated successfully!");
     });
+
+    // Add subtitle track to the master playlist
+    playlistContent += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,LANGUAGE="en",URI="subtitle.srt"\n`;
+
+    fs.writeFileSync(playlistPath, playlistContent);
+    console.log("Playlist file generated successfully!");
   } catch (error) {
     console.log("Error generating playlist file");
     console.error(error);
@@ -195,7 +198,10 @@ async function uploadFile(filePath, finalBucketName, videoName, prefix = "") {
       })
     );
 
-    if (fileName.includes("index.m3u8") || fileName.includes("playlist.m3u8")) {
+    if (
+      fileName.includes("index.m3u8") ||
+      fileName.includes("playlist.m3u8" || fileName.includes("subtitle.srt"))
+    ) {
       const objectLink = `https://s3.ap-south-1.amazonaws.com/${finalBucketName}/${key}`;
       if (key.includes("360P")) {
         allLinks["360p"] = objectLink;
@@ -207,9 +213,13 @@ async function uploadFile(filePath, finalBucketName, videoName, prefix = "") {
         allLinks["1080p"] = objectLink;
       } else if (key.includes("playlist.m3u8")) {
         allLinks["playlist"] = objectLink;
+      } else if (key.includes("subtitle.srt")) {
+        allLinks["subtitle"] = objectLink;
       }
       console.log("Video link for resolution", key, objectLink);
     }
+
+    console.log("All links => ", allLinks);
 
     return data;
   } catch (error) {
@@ -293,6 +303,32 @@ async function generateThumbnail(objectKey, bucketName) {
   }
 }
 
+async function generateSubtitle(objectKey, bucketName) {
+  const videoUrl = `https://s3.ap-south-1.amazonaws.com/${bucketName}/${objectKey}`;
+
+  try {
+    const response = await axios.post(process.env.SUBTITLE_API_ENDPOINT, {
+      video_url: videoUrl,
+    });
+
+    if (response.status !== 200) {
+      throw new Error("Failed to generate subtitles");
+    }
+
+    const subtitleContent = response.data;
+    const videoName = objectKey.split("/")[1];
+    const filePath = path.join(__dirname, "subtitle.srt");
+    fs.writeFileSync(filePath, subtitleContent);
+
+    await uploadFile(filePath, process.env.FINAL_S3_BUCKET_NAME, videoName);
+    fs.unlinkSync(filePath);
+    console.log("Subtitles generated and saved successfully!");
+  } catch (error) {
+    console.error("Error generating subtitles:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   runParallelTasks,
   downloadVideo,
@@ -300,4 +336,5 @@ module.exports = {
   uploadFolderToS3Bucket,
   deleteObjectFromTempBucket,
   generateThumbnail,
+  generateSubtitle,
 };

@@ -61,6 +61,10 @@ async function triggerTranscodingJob(job) {
                 name: "THUMBNAIL_API_ENDPOINT",
                 value: process.env.THUMBNAIL_API_ENDPOINT,
               },
+              {
+                name: "SUBTITLE_API_ENDPOINT",
+                value: process.env.SUBTITLE_API_ENDPOINT,
+              },
             ],
           },
         ],
