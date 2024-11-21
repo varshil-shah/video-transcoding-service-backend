@@ -63,9 +63,7 @@ exports.getVideoStatus = catchAsync(async (req, res, next) => {
 });
 
 exports.getVideos = catchAsync(async (req, res, next) => {
-  const videos = await Video.find().select(
-    "-__v -updatedAt -fileName -videoResolutions -objectKey -type"
-  );
+  const videos = await Video.find().select("-__v -updatedAt");
 
   res.status(200).json({
     status: "success",

@@ -69,6 +69,12 @@ async function triggerTranscodingJob(job) {
           },
         ],
       },
+      tags: [
+        {
+          key: "Purpose",
+          value: "Video Transcoding",
+        },
+      ],
     });
 
     await ecsClient.send(command);

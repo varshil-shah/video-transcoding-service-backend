@@ -11,9 +11,6 @@ const videoSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    duration: {
-      type: Number,
-    },
     fileName: {
       type: String,
       trim: true,
