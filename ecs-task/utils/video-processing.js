@@ -131,6 +131,35 @@ async function runParallelTasks(folderPath, videoPath) {
   }
 }
 
+function convertSrtToVtt(srtContent) {
+  let vttContent = "WEBVTT\n\n";
+
+  const lines = srtContent.split("\n");
+  let inTimestamp = false;
+
+  for (let line of lines) {
+    if (line.trim() === "") {
+      vttContent += "\n";
+      continue;
+    }
+
+    if (/^\d+$/.test(line.trim())) {
+      continue;
+    }
+
+    if (line.includes("-->")) {
+      line = line.replace(",", ".");
+      inTimestamp = true;
+    } else if (inTimestamp) {
+      inTimestamp = false;
+    }
+
+    vttContent += line + "\n";
+  }
+
+  return vttContent;
+}
+
 function generatePlaylistFile(folderPath) {
   const playlistPath = path.join(folderPath, "playlist.m3u8");
 
@@ -140,11 +169,8 @@ function generatePlaylistFile(folderPath) {
     videoFormat.forEach((format) => {
       const bandwidth = calculateBandwidth(format.resolution);
       playlistContent += `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${format.resolution},SUBTITLES="subs"\n`;
-      playlistContent += `${format.name}/index.m3u8\n`;
+      playlistContent += `${format.name}/index.m3u8\n\n`;
     });
-
-    // Add subtitle track to the master playlist
-    playlistContent += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,LANGUAGE="en",URI="subtitle.srt"\n`;
 
     fs.writeFileSync(playlistPath, playlistContent);
     console.log("Playlist file generated successfully!");
@@ -198,10 +224,7 @@ async function uploadFile(filePath, finalBucketName, videoName, prefix = "") {
       })
     );
 
-    if (
-      fileName.includes("index.m3u8") ||
-      fileName.includes("playlist.m3u8" || fileName.includes("subtitle.srt"))
-    ) {
+    if (fileName.includes("index.m3u8") || fileName.includes("playlist.m3u8")) {
       const objectLink = `https://s3.ap-south-1.amazonaws.com/${finalBucketName}/${key}`;
       if (key.includes("360P")) {
         allLinks["360p"] = objectLink;
@@ -213,8 +236,6 @@ async function uploadFile(filePath, finalBucketName, videoName, prefix = "") {
         allLinks["1080p"] = objectLink;
       } else if (key.includes("playlist.m3u8")) {
         allLinks["playlist"] = objectLink;
-      } else if (key.includes("subtitle.srt")) {
-        allLinks["subtitle"] = objectLink;
       }
       console.log("Video link for resolution", key, objectLink);
     }
@@ -305,8 +326,11 @@ async function generateThumbnail(objectKey, bucketName) {
 
 async function generateSubtitle(objectKey, bucketName) {
   const videoUrl = `https://s3.ap-south-1.amazonaws.com/${bucketName}/${objectKey}`;
+  const videoName = objectKey.split("/").pop().split(".")[0];
 
   try {
+    console.log("Generating subtitles for video:", videoUrl);
+
     const response = await axios.post(process.env.SUBTITLE_API_ENDPOINT, {
       video_url: videoUrl,
     });
@@ -315,16 +339,47 @@ async function generateSubtitle(objectKey, bucketName) {
       throw new Error("Failed to generate subtitles");
     }
 
-    const subtitleContent = response.data;
-    const videoName = objectKey.split("/")[1];
-    const filePath = path.join(__dirname, "subtitle.srt");
-    fs.writeFileSync(filePath, subtitleContent);
+    const srtContent = response.data;
+    const vttContent = convertSrtToVtt(srtContent);
 
-    await uploadFile(filePath, process.env.FINAL_S3_BUCKET_NAME, videoName);
-    fs.unlinkSync(filePath);
-    console.log("Subtitles generated and saved successfully!");
+    const subtitlePath = path.join(
+      __dirname,
+      "..",
+      "downloads",
+      videoName,
+      "subtitles.vtt"
+    );
+
+    const subtitleDir = path.dirname(subtitlePath);
+    if (!fs.existsSync(subtitleDir)) {
+      fs.mkdirSync(subtitleDir, { recursive: true });
+    }
+
+    fs.writeFileSync(subtitlePath, vttContent);
+    console.log("Subtitle file created at:", subtitlePath);
+
+    const fileStream = fs.createReadStream(subtitlePath);
+    const s3Key = `videos/${videoName}/subtitles.vtt`;
+
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: process.env.FINAL_S3_BUCKET_NAME,
+        Key: s3Key,
+        Body: fileStream,
+        ContentType: "text/vtt",
+      })
+    );
+
+    const subtitleUrl = `https://s3.ap-south-1.amazonaws.com/${process.env.FINAL_S3_BUCKET_NAME}/${s3Key}`;
+    allLinks.subtitle = subtitleUrl;
+
+    console.log("Subtitle uploaded successfully to S3:", subtitleUrl);
+
+    fs.unlinkSync(subtitlePath);
+
+    return subtitleUrl;
   } catch (error) {
-    console.error("Error generating subtitles:", error);
+    console.error("Error in generateSubtitle:", error);
     throw error;
   }
 }
