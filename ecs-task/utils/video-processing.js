@@ -148,7 +148,7 @@ function convertSrtToVtt(srtContent) {
     }
 
     if (line.includes("-->")) {
-      line = line.replace(",", ".");
+      line = line.replace(/,/g, ".");
       inTimestamp = true;
     } else if (inTimestamp) {
       inTimestamp = false;
@@ -239,8 +239,6 @@ async function uploadFile(filePath, finalBucketName, videoName, prefix = "") {
       }
       console.log("Video link for resolution", key, objectLink);
     }
-
-    console.log("All links => ", allLinks);
 
     return data;
   } catch (error) {
