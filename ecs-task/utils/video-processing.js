@@ -134,30 +134,38 @@ async function runParallelTasks(folderPath, videoPath) {
 function convertSrtToVtt(srtContent) {
   let vttContent = "WEBVTT\n\n";
 
-  const lines = srtContent.split("\n");
+  const lines = srtContent.split("\n").filter((line) => line.trim() !== "");
   let inTimestamp = false;
+  let lastLineWasEmpty = false;
 
-  for (let line of lines) {
-    if (line.trim() === "") {
-      vttContent += "\n";
-      continue;
-    }
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
 
     if (/^\d+$/.test(line.trim())) {
       continue;
     }
 
     if (line.includes("-->")) {
-      line = line.replace(/,/g, ".");
+      if (!lastLineWasEmpty && vttContent !== "WEBVTT\n\n") {
+        vttContent += "\n";
+      }
+      vttContent += line.replace(/,/g, ".") + "\n";
       inTimestamp = true;
-    } else if (inTimestamp) {
-      inTimestamp = false;
+      lastLineWasEmpty = false;
+      continue;
     }
 
-    vttContent += line + "\n";
+    if (line.trim() !== "") {
+      vttContent += line + "\n";
+      lastLineWasEmpty = false;
+      inTimestamp = false;
+    } else if (!lastLineWasEmpty && i < lines.length - 1) {
+      vttContent += "\n";
+      lastLineWasEmpty = true;
+    }
   }
 
-  return vttContent;
+  return vttContent.trim() + "\n";
 }
 
 function generatePlaylistFile(folderPath) {
@@ -251,7 +259,7 @@ async function deleteObjectFromTempBucket(key) {
   try {
     await s3Client.send(
       new DeleteObjectCommand({
-        Bucket: "temp-videos.video-transcoding-service",
+        Bucket: process.env.TEMP_S3_BUCKET_NAME,
         Key: key,
       })
     );
