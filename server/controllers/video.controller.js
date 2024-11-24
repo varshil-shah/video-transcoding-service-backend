@@ -76,7 +76,7 @@ exports.getVideos = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllVideosByMe = catchAsync(async (req, res, next) => {
-  const videos = await Video.find({ user: req.user._id });
+  const videos = await Video.find({ owner: req.user._id });
 
   res.status(200).json({
     status: "success",
