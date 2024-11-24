@@ -59,6 +59,11 @@ const videoSchema = new mongoose.Schema(
 );
 
 videoSchema.pre(/^find/, function (next) {
+  this.find({ isPublished: { $ne: false } });
+  next();
+});
+
+videoSchema.pre(/^find/, function (next) {
   this.populate("owner");
   next();
 });

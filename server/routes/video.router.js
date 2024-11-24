@@ -20,5 +20,6 @@ router.get("/me", videoController.getAllVideosByMe);
 router.get("/", videoController.getVideos);
 router.get("/:id", videoController.getVideo);
 router.get("/:id/status", videoController.getVideoStatus);
+router.get("/update-views/:id", videoController.updateViews);
 
 module.exports = router;

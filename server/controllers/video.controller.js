@@ -38,7 +38,6 @@ exports.getVideo = catchAsync(async (req, res, next) => {
     return next(new AppError("No video found with that ID!", 404));
   }
 
-  video.views += 1;
   await video.save();
 
   res.status(200).json({
@@ -63,7 +62,9 @@ exports.getVideoStatus = catchAsync(async (req, res, next) => {
 });
 
 exports.getVideos = catchAsync(async (req, res, next) => {
-  const videos = await Video.find().select("-__v -updatedAt");
+  const videos = await Video.find({ progress: "completed" }).select(
+    "-__v -updatedAt -password"
+  );
 
   res.status(200).json({
     status: "success",
@@ -82,6 +83,24 @@ exports.getAllVideosByMe = catchAsync(async (req, res, next) => {
     results: videos.length,
     data: {
       videos,
+    },
+  });
+});
+
+exports.updateViews = catchAsync(async (req, res, next) => {
+  const video = await Video.findById(req.params.id);
+
+  if (!video) {
+    return next(new AppError("No video found with that ID!", 404));
+  }
+
+  video.views += 1;
+  await video.save();
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      video,
     },
   });
 });
